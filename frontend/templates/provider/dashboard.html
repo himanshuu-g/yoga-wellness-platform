@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Provider Dashboard | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="provider-container">
+
+    <h1>Provider Dashboard</h1>
+
+    <p>
+        Welcome, {{ current_user.name }}.
+    </p>
+
+
+    <div class="provider-card">
+
+        <h2>Verification Status</h2>
+
+
+        {% if profile %}
+
+            {% if profile.verification_status == "APPROVED" %}
+
+                <p>
+                    ✅ Approved
+                </p>
+
+            {% elif profile.verification_status == "REJECTED" %}
+
+                <p>
+                    ❌ Rejected
+                </p>
+
+            {% else %}
+
+                <p>
+                    ⏳ Pending Review
+                </p>
+
+            {% endif %}
+
+        {% else %}
+
+            <p>
+                Provider profile has not been completed.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="provider-card">
+
+        <h2>Professional Profile</h2>
+
+        <p>
+            <a href="{{ url_for('provider.profile') }}">
+                Edit Provider Profile
+            </a>
+        </p>
+
+    </div>
+
+
+    {% if profile and profile.verification_status == "APPROVED" %}
+
+    <div class="provider-card">
+
+        <h2>Provider Tools</h2>
+
+        <p>
+            Your provider account is approved.
+            You can now configure your services.
+        </p>
+
+        <a href="{{ url_for('provider.services') }}">
+            Manage My Services
+        </a>
+
+        <p>
+            <a href="{{ url_for('provider.availability') }}">
+                Manage Weekly Availability
+            </a>
+        </p>
+
+    </div>
+
+{% endif %}
+
+</section>
+
+{% endblock %}

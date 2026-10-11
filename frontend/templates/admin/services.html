@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Manage Services | Admin
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-container">
+
+    <h1>Services</h1>
+
+
+    <p>
+        <a href="{{ url_for('admin.dashboard') }}">
+            ← Admin Dashboard
+        </a>
+    </p>
+
+
+    <p>
+        <a href="{{ url_for('admin.add_service') }}">
+            + Add Service
+        </a>
+    </p>
+
+
+    {% if services %}
+
+        {% for service in services %}
+
+            <div class="admin-card">
+
+                <h2>
+                    {{ service.name }}
+                </h2>
+
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ service.category.name }}
+                </p>
+
+
+                <p>
+                    <strong>Slug:</strong>
+                    {{ service.slug }}
+                </p>
+
+
+                <p>
+                    <strong>Mode:</strong>
+                    {{ service.service_mode }}
+                </p>
+
+
+                {% if service.base_price is not none %}
+
+                    <p>
+                        <strong>Price:</strong>
+                        ₹{{ service.base_price }}
+                    </p>
+
+                {% endif %}
+
+
+                <p>
+                    <strong>Status:</strong>
+
+                    {% if service.is_active %}
+                        Active
+                    {% else %}
+                        Inactive
+                    {% endif %}
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'admin.edit_service',
+                        service_id=service.id
+                    ) }}"
+                >
+                    Edit
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.toggle_service',
+                        service_id=service.id
+                    ) }}"
+                    style="display: inline;"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+
+                    {% if service.is_active %}
+
+                        <button type="submit">
+                            Deactivate
+                        </button>
+
+                    {% else %}
+
+                        <button type="submit">
+                            Activate
+                        </button>
+
+                    {% endif %}
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+My Services | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="provider-container">
+
+    <h1>My Services</h1>
+
+    <p>
+        Manage the services you provide,
+        your pricing and session duration.
+    </p>
+
+
+    {% if profile.verification_status == "APPROVED" %}
+
+        <p>
+            <a href="{{ url_for('provider.add_service') }}">
+                + Add Service
+            </a>
+        </p>
+
+    {% else %}
+
+        <p>
+            Your account must be approved before
+            you can add services.
+        </p>
+
+    {% endif %}
+
+
+    {% if provider_services %}
+
+        {% for provider_service in provider_services %}
+
+            <div class="provider-card">
+
+                <h2>
+                    {{ provider_service.service.name }}
+                </h2>
+
+
+                <p>
+                    <strong>Category:</strong>
+
+                    {{ provider_service.service.category.name }}
+                </p>
+
+
+                <p>
+                    <strong>Provider Price:</strong>
+
+                    {% if provider_service.price is not none %}
+
+                        ₹{{ provider_service.price }}
+
+                    {% elif provider_service.service.base_price is not none %}
+
+                        Default ₹{{ provider_service.service.base_price }}
+
+                    {% else %}
+
+                        Not set
+
+                    {% endif %}
+                </p>
+
+
+                <p>
+                    <strong>Duration:</strong>
+
+                    {% if provider_service.duration_minutes %}
+
+                        {{ provider_service.duration_minutes }}
+                        minutes
+
+                    {% elif provider_service.service.duration_minutes %}
+
+                        {{ provider_service.service.duration_minutes }}
+                        minutes (default)
+
+                    {% else %}
+
+                        Not set
+
+                    {% endif %}
+                </p>
+
+
+                <p>
+                    <strong>Status:</strong>
+
+                    {% if provider_service.is_active %}
+
+                        Active
+
+                    {% else %}
+
+                        Inactive
+
+                    {% endif %}
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'provider.edit_service',
+                        provider_service_id=provider_service.id
+                    ) }}"
+                >
+                    Edit
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'provider.toggle_service',
+                        provider_service_id=provider_service.id
+                    ) }}"
+                    style="display: inline;"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button type="submit">
+
+                        {% if provider_service.is_active %}
+                            Deactivate
+                        {% else %}
+                            Activate
+                        {% endif %}
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            You have not added any services yet.
+        </p>
+
+    {% endif %}
+
+
+    <p>
+        <a href="{{ url_for('provider.dashboard') }}">
+            Back to Provider Dashboard
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

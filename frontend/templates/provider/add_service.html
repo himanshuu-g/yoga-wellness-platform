@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Add Service | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="provider-container">
+
+    <h1>Add Service</h1>
+
+    <form method="POST">
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <div>
+
+            <label for="service_id">
+                Service *
+            </label>
+
+            <select
+                id="service_id"
+                name="service_id"
+                required
+            >
+
+                <option value="">
+                    Select Service
+                </option>
+
+                {% for service in services %}
+
+                    <option value="{{ service.id }}">
+
+                        {{ service.name }}
+
+                        {% if service.category %}
+                            — {{ service.category.name }}
+                        {% endif %}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label for="price">
+                Your Price (₹)
+            </label>
+
+            <input
+                id="price"
+                type="number"
+                name="price"
+                min="0"
+                step="0.01"
+                placeholder="Example: 800"
+            >
+
+            <small>
+                Leave blank if you want to use the
+                default service price.
+            </small>
+
+        </div>
+
+
+        <div>
+
+            <label for="duration_minutes">
+                Session Duration (minutes)
+            </label>
+
+            <input
+                id="duration_minutes"
+                type="number"
+                name="duration_minutes"
+                min="1"
+                placeholder="Example: 60"
+            >
+
+            <small>
+                Leave blank to use the default
+                service duration.
+            </small>
+
+        </div>
+
+
+        <button type="submit">
+            Add Service
+        </button>
+
+    </form>
+
+
+    <p>
+        <a href="{{ url_for('provider.services') }}">
+            Cancel
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

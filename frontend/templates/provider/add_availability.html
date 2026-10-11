@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Availability | Yoga & Wellness
+{% endblock %}
+
+{% block content %}
+
+<section class="provider-container">
+
+    <h1>Add Weekly Availability</h1>
+
+    <form method="POST">
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <div>
+            <label for="day_of_week">Day</label>
+
+            <select
+                id="day_of_week"
+                name="day_of_week"
+                required
+            >
+                {% for day in days %}
+
+                    <option value="{{ loop.index0 }}">
+                        {{ day }}
+                    </option>
+
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="start_time">Start Time</label>
+
+            <input
+                type="time"
+                id="start_time"
+                name="start_time"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="end_time">End Time</label>
+
+            <input
+                type="time"
+                id="end_time"
+                name="end_time"
+                required
+            >
+        </div>
+
+        <button type="submit">
+            Save Availability
+        </button>
+
+    </form>
+
+    <p>
+        <a href="{{ url_for('provider.availability') }}">
+            Cancel
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

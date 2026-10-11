@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Yoga & Wellness
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/main.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header>
+
+        <h2>
+            <a href="{{ url_for('home') }}">
+                Yoga & Wellness
+            </a>
+        </h2>
+
+        <nav>
+
+            <!-- =================================
+                 LOGGED-IN USER NAVIGATION
+            ================================== -->
+
+            {% if current_user.is_authenticated %}
+
+
+                <!-- Public services are available
+                     to every authenticated role -->
+
+                <a href="{{ url_for('services.service_catalog') }}">
+                    Services
+                </a>
+
+
+            <!-- =============================
+                 CUSTOMER NAVIGATION
+            ============================== -->
+
+                {% if current_user.role == "CUSTOMER" %}
+
+                    <a href="{{ url_for('customer.profile') }}">
+                        My Profile
+                    </a>
+
+                    <a href="{{ url_for('bookings.history') }}">
+                        My Bookings
+                    </a>
+
+
+                <!-- =============================
+                     PROVIDER NAVIGATION
+                ============================== -->
+
+                {% elif current_user.role == "PROVIDER" %}
+
+                    <a href="{{ url_for('provider.dashboard') }}">
+                        Provider Dashboard
+                    </a>
+
+                    <a href="{{ url_for('provider.profile') }}">
+                        Provider Profile
+                    </a>
+
+                    <a href="{{ url_for('provider.services') }}">
+                        My Services
+                    </a>
+
+                    <a href="{{ url_for('provider.availability') }}">
+                        My Availability
+                     </a>
+
+
+                <!-- =============================
+                     ADMIN NAVIGATION
+                ============================== -->
+
+                {% elif current_user.role == "ADMIN" %}
+
+                    <a href="{{ url_for('admin.dashboard') }}">
+                        Admin Dashboard
+                    </a>
+
+                    <a href="{{ url_for('admin.categories') }}">
+                        Categories
+                    </a>
+
+                    <a href="{{ url_for('admin.services') }}">
+                        Manage Services
+                    </a>
+
+                    <a href="{{ url_for('admin.providers') }}">
+                        Providers
+                    </a>
+
+                {% endif %}
+
+
+                <!-- =============================
+                     CURRENT USER
+                ============================== -->
+
+                <span>
+                    Hello, {{ current_user.name }}
+                </span>
+
+
+                <!-- =============================
+                     LOGOUT
+                ============================== -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for('auth.logout') }}"
+                    style="display: inline;"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button type="submit">
+                        Logout
+                    </button>
+
+                </form>
+
+
+            <!-- =================================
+                 GUEST NAVIGATION
+            ================================== -->
+
+            {% else %}
+
+                <a href="{{ url_for('services.service_catalog') }}">
+                    Services
+                </a>
+
+                <a href="{{ url_for('auth.login') }}">
+                    Login
+                </a>
+
+                <a href="{{ url_for('auth.register') }}">
+                    Register
+                </a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================================
+         FLASH MESSAGES
+    ========================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div class="flash-messages">
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- =========================================
+         PAGE CONTENT
+    ========================================== -->
+
+    <main>
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script
+        src="{{ url_for('static', filename='js/main.js') }}">
+    </script>
+
+</body>
+
+</html>

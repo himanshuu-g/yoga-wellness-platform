@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ service.name }} | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="service-detail">
+
+    <p>
+        <a
+            href="{{ url_for(
+                'services.category_detail',
+                slug=service.category.slug
+            ) }}"
+        >
+            ← {{ service.category.name }}
+        </a>
+    </p>
+
+
+    <h1>
+        {{ service.name }}
+    </h1>
+
+
+    {% if service.short_description %}
+
+        <p>
+            {{ service.short_description }}
+        </p>
+
+    {% endif %}
+
+
+    {% if service.description %}
+
+        <div>
+            {{ service.description }}
+        </div>
+
+    {% endif %}
+
+    {% if current_user.is_authenticated
+      and current_user.role == "CUSTOMER" %}
+
+    <a href="{{ url_for(
+        'bookings.new_booking',
+        service_id=service.id
+    ) }}">
+        Book This Service
+    </a>
+
+{% elif not current_user.is_authenticated %}
+
+    <p>
+        Please log in to book this service.
+    </p>
+
+    <a href="{{ url_for('auth.login') }}">
+        Login to Book
+    </a>
+
+{% endif %}
+
+    {% if service.duration_minutes %}
+
+        <p>
+            <strong>Duration:</strong>
+
+            {{ service.duration_minutes }}
+            minutes
+        </p>
+
+    {% endif %}
+
+
+    {% if service.base_price is not none %}
+
+        <p>
+            <strong>Starting Price:</strong>
+
+            ₹{{ service.base_price }}
+        </p>
+
+    {% endif %}
+
+
+    <p>
+        <strong>Service Mode:</strong>
+        {{ service.service_mode }}
+    </p>
+
+
+    <!-- Booking will be connected later -->
+
+    <button type="button" disabled>
+        Booking Coming Soon
+    </button>
+
+</section>
+
+{% endblock %}

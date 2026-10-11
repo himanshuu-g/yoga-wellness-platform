@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Edit Service | Admin
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-container">
+
+    <h1>Edit Service</h1>
+
+
+    <form method="POST">
+
+        <!-- CSRF Protection -->
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <!-- Category -->
+        <div>
+
+            <label for="category_id">
+                Category *
+            </label>
+
+            <select
+                id="category_id"
+                name="category_id"
+                required
+            >
+
+                {% for category in categories %}
+
+                    <option
+                        value="{{ category.id }}"
+                        {% if category.id == service.category_id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- Service Name -->
+        <div>
+
+            <label for="name">
+                Service Name *
+            </label>
+
+            <input
+                id="name"
+                name="name"
+                type="text"
+                value="{{ service.name }}"
+                maxlength="150"
+                required
+            >
+
+        </div>
+
+
+        <!-- Slug -->
+        <div>
+
+            <label for="slug">
+                Slug *
+            </label>
+
+            <input
+                id="slug"
+                name="slug"
+                type="text"
+                value="{{ service.slug }}"
+                maxlength="170"
+                required
+            >
+
+        </div>
+
+
+        <!-- Short Description -->
+        <div>
+
+            <label for="short_description">
+                Short Description
+            </label>
+
+            <input
+                id="short_description"
+                name="short_description"
+                type="text"
+                value="{{ service.short_description or '' }}"
+                maxlength="300"
+            >
+
+        </div>
+
+
+        <!-- Full Description -->
+        <div>
+
+            <label for="description">
+                Full Description
+            </label>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="6"
+            >{{ service.description or '' }}</textarea>
+
+        </div>
+
+
+        <!-- Duration -->
+        <div>
+
+            <label for="duration_minutes">
+                Duration (minutes)
+            </label>
+
+            <input
+                id="duration_minutes"
+                name="duration_minutes"
+                type="number"
+                min="1"
+                value="{{ service.duration_minutes or '' }}"
+            >
+
+        </div>
+
+
+        <!-- Price -->
+        <div>
+
+            <label for="base_price">
+                Starting Price (₹)
+            </label>
+
+            <input
+                id="base_price"
+                name="base_price"
+                type="number"
+                min="0"
+                step="0.01"
+                value="{{ service.base_price if service.base_price is not none else '' }}"
+            >
+
+        </div>
+
+
+        <!-- Service Mode -->
+        <div>
+
+            <label for="service_mode">
+                Service Mode
+            </label>
+
+            <select
+                id="service_mode"
+                name="service_mode"
+            >
+
+                <option
+                    value="HOME"
+                    {% if service.service_mode == "HOME" %}
+                        selected
+                    {% endif %}
+                >
+                    Home
+                </option>
+
+
+                <option
+                    value="ONLINE"
+                    {% if service.service_mode == "ONLINE" %}
+                        selected
+                    {% endif %}
+                >
+                    Online
+                </option>
+
+
+                <option
+                    value="CENTER"
+                    {% if service.service_mode == "CENTER" %}
+                        selected
+                    {% endif %}
+                >
+                    Center
+                </option>
+
+
+                <option
+                    value="HYBRID"
+                    {% if service.service_mode == "HYBRID" %}
+                        selected
+                    {% endif %}
+                >
+                    Hybrid
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Display Order -->
+        <div>
+
+            <label for="display_order">
+                Display Order
+            </label>
+
+            <input
+                id="display_order"
+                name="display_order"
+                type="number"
+                min="0"
+                value="{{ service.display_order }}"
+            >
+
+        </div>
+
+
+        <!-- Submit -->
+        <button type="submit">
+            Save Changes
+        </button>
+
+    </form>
+
+
+    <p>
+        <a href="{{ url_for('admin.services') }}">
+            Cancel
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

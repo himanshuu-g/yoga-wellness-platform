@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Bookings | Yoga & Wellness
+{% endblock %}
+
+{% block content %}
+
+<section class="booking-container">
+
+    <h1>My Bookings</h1>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+        <div class="booking-card">
+
+            <h2>{{ booking.service.name }}</h2>
+
+            <p>
+                <strong>Provider:</strong>
+                {{ booking.provider.user.name }}
+            </p>
+
+            <p>
+                <strong>Date:</strong>
+                {{ booking.booking_date }}
+            </p>
+
+            <p>
+                <strong>Time:</strong>
+                {{ booking.start_time.strftime('%I:%M %p') }}
+                –
+                {{ booking.end_time.strftime('%I:%M %p') }}
+            </p>
+
+            <p>
+                <strong>Price:</strong>
+                ₹{{ booking.total_price }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                {{ booking.status }}
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>You haven't requested any bookings yet.</p>
+
+    {% endif %}
+
+    <a href="{{ url_for('services.service_catalog') }}">
+        Browse Services
+    </a>
+
+</section>
+
+{% endblock %}

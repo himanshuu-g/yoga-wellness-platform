@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Providers | Admin
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-container">
+
+    <h1>Providers</h1>
+
+
+    <p>
+        <a href="{{ url_for('admin.provider_candidates') }}">
+            + Add Provider
+        </a>
+    </p>
+
+
+    {% if providers %}
+
+        {% for user in providers %}
+
+            <div class="admin-card">
+
+                <h2>
+                    {{ user.name }}
+                </h2>
+
+                <p>
+                    <strong>Email:</strong>
+                    {{ user.email }}
+                </p>
+
+
+                {% if user.provider_profile %}
+
+                    <p>
+                        <strong>Qualification:</strong>
+
+                        {{ user.provider_profile.qualification or "Not provided" }}
+                    </p>
+
+
+                    <p>
+                        <strong>Specialization:</strong>
+
+                        {{ user.provider_profile.specialization or "Not provided" }}
+                    </p>
+
+
+                    <p>
+                        <strong>Experience:</strong>
+
+                        {% if user.provider_profile.experience_years is not none %}
+
+                            {{ user.provider_profile.experience_years }}
+                            years
+
+                        {% else %}
+
+                            Not provided
+
+                        {% endif %}
+                    </p>
+
+
+                    <p>
+                        <strong>Service City:</strong>
+
+                        {{ user.provider_profile.service_city or "Not provided" }}
+                    </p>
+
+
+                    <p>
+                        <strong>Verification:</strong>
+
+                        {{ user.provider_profile.verification_status }}
+                    </p>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'admin.provider_verification',
+                            provider_id=user.provider_profile.id
+                        ) }}"
+                        style="display: inline;"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="APPROVE"
+                        >
+
+                        <button type="submit">
+                            Approve
+                        </button>
+
+                    </form>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'admin.provider_verification',
+                            provider_id=user.provider_profile.id
+                        ) }}"
+                        style="display: inline;"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="REJECT"
+                        >
+
+                        <button type="submit">
+                            Reject
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <p>
+                        Provider profile missing.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No providers found.
+        </p>
+
+    {% endif %}
+
+
+    <p>
+        <a href="{{ url_for('admin.dashboard') }}">
+            Back to Admin Dashboard
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

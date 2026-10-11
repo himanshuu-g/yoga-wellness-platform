@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}
+Book {{ service.name }} | Yoga & Wellness
+{% endblock %}
+
+{% block content %}
+
+<section class="booking-container">
+
+    <h1>Book {{ service.name }}</h1>
+
+    <p>{{ service.short_description or "" }}</p>
+
+    {% if provider_services %}
+
+    <form method="POST">
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <div>
+            <label for="provider_service_id">
+                Select Provider
+            </label>
+
+            <select
+                id="provider_service_id"
+                name="provider_service_id"
+                required
+            >
+                <option value="">Choose Provider</option>
+
+                {% for item in provider_services %}
+
+                <option value="{{ item.id }}">
+
+                    {{ item.provider.user.name }}
+
+                    — ₹{{ item.price if item.price is not none
+                        else item.service.base_price or "Price unavailable" }}
+
+                    — {{ item.duration_minutes or
+                        item.service.duration_minutes or "?" }} min
+
+                </option>
+
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="booking_date">
+                Booking Date
+            </label>
+
+            <input
+                type="date"
+                id="booking_date"
+                name="booking_date"
+                min="{{ today }}"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="start_time">
+                Preferred Start Time
+            </label>
+
+            <input
+                type="time"
+                id="start_time"
+                name="start_time"
+                required
+            >
+
+            <small>
+                The selected time must fit the provider's
+                weekly availability. The server will validate it.
+            </small>
+        </div>
+
+        {% if service.service_mode in ["HOME", "HYBRID"] %}
+
+        <div>
+            <label for="address_id">
+                Home Address
+            </label>
+
+            <select
+                id="address_id"
+                name="address_id"
+                required
+            >
+                <option value="">Select Address</option>
+
+                {% for address in addresses %}
+
+                <option value="{{ address.id }}">
+                    Address #{{ address.id }}
+                    {% if address.is_default %}
+                        (Default)
+                    {% endif %}
+                </option>
+
+                {% endfor %}
+            </select>
+
+            {% if not addresses %}
+            <p>
+                Please add a customer address before booking.
+            </p>
+            {% endif %}
+        </div>
+
+        {% endif %}
+
+        <div>
+            <label for="customer_notes">
+                Additional Notes
+            </label>
+
+            <textarea
+                id="customer_notes"
+                name="customer_notes"
+                rows="4"
+                maxlength="1000"
+                placeholder="Any scheduling or access instructions?"
+            ></textarea>
+        </div>
+
+        <button type="submit">
+            Request Booking
+        </button>
+
+    </form>
+
+    {% else %}
+
+    <p>
+        No approved and available providers currently
+        offer this service.
+    </p>
+
+    {% endif %}
+
+    <p>
+        <a href="{{ url_for('services.service_catalog') }}">
+            Back to Services
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

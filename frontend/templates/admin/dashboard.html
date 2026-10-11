@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Admin Dashboard | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-container">
+
+    <h1>Admin Dashboard</h1>
+
+    <p>
+        Manage the Yoga & Wellness platform.
+    </p>
+
+
+    <div class="admin-stats">
+
+        <div class="admin-stat-card">
+
+            <h2>
+                {{ category_count }}
+            </h2>
+
+            <p>
+                Service Categories
+            </p>
+
+        </div>
+
+
+        <div class="admin-stat-card">
+
+            <h2>
+                {{ service_count }}
+            </h2>
+
+            <p>
+                Services
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <h2>Service Management</h2>
+
+    <h2>Provider Management</h2>
+
+    <p>
+        <a href="{{ url_for('admin.providers') }}">
+            Manage Providers
+        </a>
+    </p>
+
+
+    <p>
+        <a href="{{ url_for('admin.categories') }}">
+            Manage Categories
+        </a>
+    </p>
+
+
+    <p>
+        <a href="{{ url_for('admin.services') }}">
+            Manage Services
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Provider Candidates | Admin
+{% endblock %}
+
+
+{% block content %}
+
+<section class="admin-container">
+
+    <h1>Create Provider</h1>
+
+    <p>
+        Select an existing customer account to
+        convert into a provider account.
+    </p>
+
+
+    {% if customers %}
+
+        {% for user in customers %}
+
+            <div class="admin-card">
+
+                <h2>
+                    {{ user.name }}
+                </h2>
+
+                <p>
+                    {{ user.email }}
+                </p>
+
+                {% if user.phone %}
+
+                    <p>
+                        {{ user.phone }}
+                    </p>
+
+                {% endif %}
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.make_provider',
+                        user_id=user.id
+                    ) }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button type="submit">
+                        Make Provider
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No customer accounts are available.
+        </p>
+
+    {% endif %}
+
+
+    <p>
+        <a href="{{ url_for('admin.providers') }}">
+            Back to Providers
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

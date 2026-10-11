@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Add Address | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="address-form-container">
+
+    <h1>Add Address</h1>
+
+    <form method="POST">
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <div>
+            <label for="label">
+                Address Label *
+            </label>
+
+            <input
+                id="label"
+                type="text"
+                name="label"
+                placeholder="Home, Office, Other"
+                maxlength="50"
+                required
+            >
+        </div>
+
+
+        <div>
+            <label for="address_line_1">
+                Address Line 1 *
+            </label>
+
+            <input
+                id="address_line_1"
+                type="text"
+                name="address_line_1"
+                placeholder="House / Flat / Building"
+                maxlength="255"
+                required
+            >
+        </div>
+
+
+        <div>
+            <label for="address_line_2">
+                Address Line 2
+            </label>
+
+            <input
+                id="address_line_2"
+                type="text"
+                name="address_line_2"
+                placeholder="Street / Block"
+                maxlength="255"
+            >
+        </div>
+
+
+        <div>
+            <label for="locality">
+                Locality *
+            </label>
+
+            <input
+                id="locality"
+                type="text"
+                name="locality"
+                maxlength="100"
+                required
+            >
+        </div>
+
+
+        <div>
+            <label for="city">
+                City *
+            </label>
+
+            <input
+                id="city"
+                type="text"
+                name="city"
+                maxlength="100"
+                required
+            >
+        </div>
+
+
+        <div>
+            <label for="state">
+                State *
+            </label>
+
+            <input
+                id="state"
+                type="text"
+                name="state"
+                maxlength="100"
+                required
+            >
+        </div>
+
+
+        <div>
+            <label for="postal_code">
+                PIN Code *
+            </label>
+
+            <input
+                id="postal_code"
+                type="text"
+                name="postal_code"
+                inputmode="numeric"
+                pattern="[0-9]{6}"
+                maxlength="6"
+                placeholder="6-digit PIN"
+                required
+            >
+        </div>
+
+
+        <div>
+            <label for="landmark">
+                Landmark
+            </label>
+
+            <input
+                id="landmark"
+                type="text"
+                name="landmark"
+                maxlength="255"
+            >
+        </div>
+
+
+        <button type="submit">
+            Save Address
+        </button>
+
+    </form>
+
+
+    <p>
+        <a href="{{ url_for('customer.profile') }}">
+            Back to Profile
+        </a>
+    </p>
+
+</section>
+
+{% endblock %}

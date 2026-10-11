@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Services | Yoga & Wellness
+{% endblock %}
+
+
+{% block content %}
+
+<section class="services-container">
+
+    <h1>Our Services</h1>
+
+    <p>
+        Explore our yoga, naturopathy and
+        wellness services.
+    </p>
+
+
+    {% if categories %}
+
+        <div class="category-grid">
+
+            {% for category in categories %}
+
+                <div class="category-card">
+
+                    <h2>
+                        {{ category.name }}
+                    </h2>
+
+
+                    {% if category.description %}
+
+                        <p>
+                            {{ category.description }}
+                        </p>
+
+                    {% endif %}
+
+
+                    <a
+                        href="{{ url_for(
+                            'services.category_detail',
+                            slug=category.slug
+                        ) }}"
+                    >
+                        Explore Services
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p>
+            Services will be available soon.
+        </p>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
