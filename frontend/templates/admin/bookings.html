@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Bookings | Admin
+{% endblock %}
+
+{% block content %}
+
+<section class="admin-container">
+
+    <h1>All Bookings</h1>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+            <div class="admin-card">
+
+                <h2>{{ booking.service.name }}</h2>
+
+                <p><strong>Customer:</strong> {{ booking.customer.name }}</p>
+                <p><strong>Provider:</strong> {{ booking.provider.user.name }}</p>
+                <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+                <p>
+                    <strong>Time:</strong>
+                    {{ booking.start_time.strftime('%I:%M %p') }}
+                    –
+                    {{ booking.end_time.strftime('%I:%M %p') }}
+                </p>
+                <p><strong>Price:</strong> ₹{{ booking.total_price }}</p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.update_booking_status',
+                        booking_id=booking.id
+                    ) }}"
+                >
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <label for="status-{{ booking.id }}">
+                        Status
+                    </label>
+
+                    <select
+                        id="status-{{ booking.id }}"
+                        name="status"
+                    >
+                        {% for status in [
+                            "PENDING",
+                            "CONFIRMED",
+                            "REJECTED",
+                            "CANCELLED",
+                            "COMPLETED"
+                        ] %}
+                            <option
+                                value="{{ status }}"
+                                {% if booking.status == status %}selected{% endif %}
+                            >
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit">
+                        Update Status
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No bookings have been created yet.</p>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

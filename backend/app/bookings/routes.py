@@ -344,3 +344,153 @@ def history():
         "bookings/history.html",
         bookings=bookings
     )
+
+
+# =================================================
+# CUSTOMER BOOKING CANCELLATION
+# =================================================
+
+@bookings_bp.route(
+    "/<int:booking_id>/cancel",
+    methods=["POST"]
+)
+@login_required
+def cancel_booking(booking_id):
+
+    if current_user.role != "CUSTOMER":
+        abort(403)
+
+    booking = db.session.get(Booking, booking_id)
+
+    if booking is None:
+        abort(404)
+
+    if booking.customer_id != current_user.id:
+        abort(403)
+
+    if booking.status not in {"PENDING", "CONFIRMED"}:
+        flash(
+            "This booking can no longer be cancelled.",
+            "error"
+        )
+        return redirect(url_for("bookings.history"))
+
+    booking_start = datetime.combine(
+        booking.booking_date,
+        booking.start_time,
+        tzinfo=BOOKING_TIMEZONE
+    )
+
+    if booking_start <= datetime.now(BOOKING_TIMEZONE):
+        flash(
+            "A past booking cannot be cancelled.",
+            "error"
+        )
+        return redirect(url_for("bookings.history"))
+
+    booking.status = "CANCELLED"
+    db.session.commit()
+
+    flash(
+        "Booking cancelled successfully.",
+        "success"
+    )
+
+    return redirect(url_for("bookings.history"))
+
+
+# =================================================
+# PROVIDER BOOKING MANAGEMENT
+# =================================================
+
+@bookings_bp.route("/provider")
+@login_required
+def provider_bookings():
+
+    if current_user.role != "PROVIDER":
+        abort(403)
+
+    profile = current_user.provider_profile
+
+    if profile is None:
+        abort(403)
+
+    bookings = db.session.execute(
+        db.select(Booking)
+        .where(Booking.provider_id == profile.id)
+        .order_by(
+            Booking.booking_date.desc(),
+            Booking.start_time.desc()
+        )
+    ).scalars().all()
+
+    return render_template(
+        "bookings/provider.html",
+        bookings=bookings
+    )
+
+
+@bookings_bp.route(
+    "/provider/<int:booking_id>/status",
+    methods=["POST"]
+)
+@login_required
+def update_provider_booking_status(booking_id):
+
+    if current_user.role != "PROVIDER":
+        abort(403)
+
+    profile = current_user.provider_profile
+
+    if profile is None:
+        abort(403)
+
+    booking = db.session.get(Booking, booking_id)
+
+    if booking is None:
+        abort(404)
+
+    if booking.provider_id != profile.id:
+        abort(403)
+
+    action = request.form.get(
+        "action",
+        ""
+    ).strip().upper()
+
+    transitions = {
+        "PENDING": {
+            "CONFIRM": "CONFIRMED",
+            "REJECT": "REJECTED"
+        },
+        "CONFIRMED": {
+            "COMPLETE": "COMPLETED",
+            "CANCEL": "CANCELLED"
+        }
+    }
+
+    new_status = transitions.get(
+        booking.status,
+        {}
+    ).get(action)
+
+    if new_status is None:
+        flash(
+            "That booking status change is not allowed.",
+            "error"
+        )
+        return redirect(
+            url_for("bookings.provider_bookings")
+        )
+
+    booking.status = new_status
+    db.session.commit()
+
+    flash(
+        f"Booking marked as {new_status.lower()}.",
+        "success"
+    )
+
+    return redirect(
+        url_for("bookings.provider_bookings")
+    )

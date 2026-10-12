@@ -15,6 +15,7 @@ from flask_login import (
 from app.extensions import db
 from app.models.address import Address
 from app.customer import customer_bp
+from app.utils.decorators import customer_required
 
 
 # -------------------------------------------------
@@ -22,6 +23,7 @@ from app.customer import customer_bp
 # -------------------------------------------------
 @customer_bp.route("/profile")
 @login_required
+@customer_required
 def profile():
     """
     Display the logged-in customer's profile
@@ -42,6 +44,7 @@ def profile():
     methods=["GET", "POST"]
 )
 @login_required
+@customer_required
 def add_address():
     """
     Add a new address for the logged-in user.
@@ -197,6 +200,7 @@ def add_address():
     methods=["GET", "POST"]
 )
 @login_required
+@customer_required
 def edit_address(address_id):
     """
     Edit an address owned by the logged-in user.
@@ -352,6 +356,7 @@ def edit_address(address_id):
     methods=["POST"]
 )
 @login_required
+@customer_required
 def set_default_address(address_id):
     """
     Set one of the logged-in user's addresses
@@ -413,6 +418,7 @@ def set_default_address(address_id):
     methods=["POST"]
 )
 @login_required
+@customer_required
 def delete_address(address_id):
     """
     Delete an address belonging to the

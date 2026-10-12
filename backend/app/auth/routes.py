@@ -15,6 +15,7 @@ from flask_login import (
 
 from app.extensions import db
 from app.models.user import User
+from app.models.customer_profile import CustomerProfile
 from app.auth import auth_bp
 
 
@@ -228,11 +229,18 @@ def register():
         # -----------------------------------------
         user.set_password(password)
 
+        customer_profile = CustomerProfile(
+            user=user
+        )
+
 
         # -----------------------------------------
         # Save user
         # -----------------------------------------
-        db.session.add(user)
+        db.session.add_all([
+            user,
+            customer_profile
+        ])
         db.session.commit()
 
 

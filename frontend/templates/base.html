@@ -89,6 +89,10 @@
                         My Availability
                      </a>
 
+                    <a href="{{ url_for('bookings.provider_bookings') }}">
+                        Booking Requests
+                    </a>
+
 
                 <!-- =============================
                      ADMIN NAVIGATION
@@ -110,6 +114,10 @@
 
                     <a href="{{ url_for('admin.providers') }}">
                         Providers
+                    </a>
+
+                    <a href="{{ url_for('admin.bookings') }}">
+                        Bookings
                     </a>
 
                 {% endif %}

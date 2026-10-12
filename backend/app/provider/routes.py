@@ -46,6 +46,78 @@ def dashboard():
     )
 
 
+@provider_bp.route(
+    "/availability-status/toggle",
+    methods=["POST"]
+)
+@login_required
+@provider_required
+def toggle_availability_status():
+    """
+    Let an approved provider go online or offline for bookings.
+
+    A provider can go online only after configuring at least one
+    active service and one active weekly availability slot.
+    """
+
+    profile = current_user.provider_profile
+
+    if profile is None:
+        abort(403)
+
+    if profile.verification_status != "APPROVED":
+        flash(
+            "Your provider account must be approved first.",
+            "error"
+        )
+        return redirect(url_for("provider.dashboard"))
+
+    if not profile.is_available:
+        active_service = db.session.execute(
+            db.select(ProviderService.id)
+            .where(
+                ProviderService.provider_id == profile.id,
+                ProviderService.is_active.is_(True)
+            )
+            .limit(1)
+        ).first()
+
+        active_slot = db.session.execute(
+            db.select(ProviderAvailability.id)
+            .where(
+                ProviderAvailability.provider_id == profile.id,
+                ProviderAvailability.is_active.is_(True)
+            )
+            .limit(1)
+        ).first()
+
+        if active_service is None:
+            flash(
+                "Add and activate at least one service before going online.",
+                "error"
+            )
+            return redirect(url_for("provider.dashboard"))
+
+        if active_slot is None:
+            flash(
+                "Add an active availability slot before going online.",
+                "error"
+            )
+            return redirect(url_for("provider.dashboard"))
+
+    profile.is_available = not profile.is_available
+    db.session.commit()
+
+    flash(
+        "You are now available for bookings."
+        if profile.is_available
+        else "You are now offline and will not receive new bookings.",
+        "success"
+    )
+
+    return redirect(url_for("provider.dashboard"))
+
+
 # =================================================
 # EDIT PROVIDER PROFILE
 # =================================================

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}
+Booking Requests | Provider
+{% endblock %}
+
+{% block content %}
+
+<section class="booking-container">
+
+    <h1>Booking Requests</h1>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+            <div class="booking-card">
+
+                <h2>{{ booking.service.name }}</h2>
+
+                <p>
+                    <strong>Customer:</strong>
+                    {{ booking.customer.name }}
+                </p>
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ booking.booking_date }}
+                </p>
+
+                <p>
+                    <strong>Time:</strong>
+                    {{ booking.start_time.strftime('%I:%M %p') }}
+                    –
+                    {{ booking.end_time.strftime('%I:%M %p') }}
+                </p>
+
+                <p>
+                    <strong>Price:</strong>
+                    ₹{{ booking.total_price }}
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    {{ booking.status }}
+                </p>
+
+                {% if booking.customer_notes %}
+
+                    <p>
+                        <strong>Customer Notes:</strong>
+                        {{ booking.customer_notes }}
+                    </p>
+
+                {% endif %}
+
+                {% if booking.address %}
+
+                    <p>
+                        <strong>Address:</strong>
+                        {{ booking.address.address_line_1 }},
+                        {{ booking.address.locality }},
+                        {{ booking.address.city }}
+                        – {{ booking.address.postal_code }}
+                    </p>
+
+                {% endif %}
+
+                {% if booking.status == "PENDING" %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'bookings.update_provider_booking_status',
+                            booking_id=booking.id
+                        ) }}"
+                        style="display: inline;"
+                    >
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" value="CONFIRM">
+                        <button type="submit">Confirm</button>
+                    </form>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'bookings.update_provider_booking_status',
+                            booking_id=booking.id
+                        ) }}"
+                        style="display: inline;"
+                    >
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" value="REJECT">
+                        <button type="submit">Reject</button>
+                    </form>
+
+                {% elif booking.status == "CONFIRMED" %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'bookings.update_provider_booking_status',
+                            booking_id=booking.id
+                        ) }}"
+                        style="display: inline;"
+                    >
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" value="COMPLETE">
+                        <button type="submit">Mark Completed</button>
+                    </form>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'bookings.update_provider_booking_status',
+                            booking_id=booking.id
+                        ) }}"
+                        style="display: inline;"
+                    >
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" value="CANCEL">
+                        <button type="submit">Cancel</button>
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No booking requests have been received yet.</p>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

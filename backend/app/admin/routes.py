@@ -15,6 +15,7 @@ from flask_login import login_required
 from app.extensions import db
 from app.models.service_category import ServiceCategory
 from app.models.service import Service
+from app.models.booking import Booking
 from app.admin import admin_bp
 from app.utils.decorators import admin_required
 
@@ -1286,3 +1287,68 @@ def provider_verification(provider_id):
     return redirect(
         url_for("admin.providers")
     )
+
+
+# =================================================
+# BOOKING OVERSIGHT
+# =================================================
+
+@admin_bp.route("/bookings")
+@login_required
+@admin_required
+def bookings():
+    """Display every booking on the platform."""
+
+    booking_list = db.session.execute(
+        db.select(Booking)
+        .order_by(
+            Booking.booking_date.desc(),
+            Booking.start_time.desc()
+        )
+    ).scalars().all()
+
+    return render_template(
+        "admin/bookings.html",
+        bookings=booking_list
+    )
+
+
+@admin_bp.route(
+    "/bookings/<int:booking_id>/status",
+    methods=["POST"]
+)
+@login_required
+@admin_required
+def update_booking_status(booking_id):
+    """Allow an administrator to correct a booking status."""
+
+    booking = db.session.get(Booking, booking_id)
+
+    if booking is None:
+        abort(404)
+
+    status = request.form.get(
+        "status",
+        ""
+    ).strip().upper()
+
+    allowed_statuses = {
+        "PENDING",
+        "CONFIRMED",
+        "REJECTED",
+        "CANCELLED",
+        "COMPLETED"
+    }
+
+    if status not in allowed_statuses:
+        abort(400)
+
+    booking.status = status
+    db.session.commit()
+
+    flash(
+        f"Booking status updated to {status.lower()}.",
+        "success"
+    )
+
+    return redirect(url_for("admin.bookings"))

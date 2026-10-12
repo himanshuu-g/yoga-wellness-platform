@@ -45,6 +45,30 @@ My Bookings | Yoga & Wellness
                 {{ booking.status }}
             </p>
 
+            {% if booking.status in ["PENDING", "CONFIRMED"] %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'bookings.cancel_booking',
+                        booking_id=booking.id
+                    ) }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button type="submit">
+                        Cancel Booking
+                    </button>
+
+                </form>
+
+            {% endif %}
+
         </div>
 
         {% endfor %}

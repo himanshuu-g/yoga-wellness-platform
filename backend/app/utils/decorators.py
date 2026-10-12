@@ -34,3 +34,19 @@ def provider_required(function):
         return function(*args, **kwargs)
 
     return decorated_function
+
+
+def customer_required(function):
+    """
+    Allow access only to CUSTOMER users.
+    """
+
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
+
+        if current_user.role != "CUSTOMER":
+            abort(403)
+
+        return function(*args, **kwargs)
+
+    return decorated_function
