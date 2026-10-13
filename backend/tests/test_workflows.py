@@ -440,6 +440,114 @@ class PlatformWorkflowTests(unittest.TestCase):
                 "CANCELLED"
             )
 
+    def test_customer_booking_security_and_validation_checklist(self):
+        with self.app.app_context():
+            data = self.seed_marketplace()
+
+            other_customer = self.create_user(
+                "Other Customer",
+                "other.customer@test.example",
+                "CUSTOMER"
+            )
+            other_address = Address(
+                user_id=other_customer.id,
+                label="Other Home",
+                address_line_1="99 Other Street",
+                locality="Other Locality",
+                city="Delhi",
+                state="Delhi",
+                postal_code="110099",
+                is_default=True
+            )
+            db.session.add(other_address)
+            db.session.commit()
+            other_address_id = other_address.id
+
+        customer_client = self.app.test_client()
+        self.login(customer_client, "customer@test.example")
+
+        booking_form = customer_client.get(
+            f"/bookings/new/{data['service_id']}"
+        )
+        self.assertEqual(booking_form.status_code, 200)
+        self.assertIn(b"Home Yoga", booking_form.data)
+        self.assertIn(b"Provider", booking_form.data)
+
+        booking_data = {
+            "provider_service_id": str(
+                data["provider_service_id"]
+            ),
+            "booking_date": data["booking_date"].isoformat(),
+            "start_time": "10:00",
+            "address_id": str(data["address_id"]),
+            "customer_notes": "Checklist booking",
+        }
+
+        create_response = customer_client.post(
+            f"/bookings/new/{data['service_id']}",
+            data=booking_data
+        )
+        self.assertEqual(create_response.status_code, 302)
+
+        with self.app.app_context():
+            booking = db.session.execute(
+                db.select(Booking)
+            ).scalar_one()
+            self.assertEqual(booking.status, "PENDING")
+
+        history = customer_client.get("/bookings/history")
+        self.assertEqual(history.status_code, 200)
+        self.assertIn(b"Home Yoga", history.data)
+        self.assertIn(b"PENDING", history.data)
+
+        overlapping_data = dict(booking_data)
+        overlapping_data["start_time"] = "10:30"
+        customer_client.post(
+            f"/bookings/new/{data['service_id']}",
+            data=overlapping_data
+        )
+
+        with self.app.app_context():
+            booking_count = db.session.scalar(
+                db.select(db.func.count()).select_from(Booking)
+            )
+            self.assertEqual(booking_count, 1)
+
+        outside_availability_data = dict(booking_data)
+        outside_availability_data["start_time"] = "18:00"
+        customer_client.post(
+            f"/bookings/new/{data['service_id']}",
+            data=outside_availability_data
+        )
+
+        with self.app.app_context():
+            booking_count = db.session.scalar(
+                db.select(db.func.count()).select_from(Booking)
+            )
+            self.assertEqual(booking_count, 1)
+
+        other_address_data = dict(booking_data)
+        other_address_data["start_time"] = "12:00"
+        other_address_data["address_id"] = str(other_address_id)
+        other_address_response = customer_client.post(
+            f"/bookings/new/{data['service_id']}",
+            data=other_address_data
+        )
+        self.assertEqual(other_address_response.status_code, 400)
+
+        with self.app.app_context():
+            booking_count = db.session.scalar(
+                db.select(db.func.count()).select_from(Booking)
+            )
+            self.assertEqual(booking_count, 1)
+
+        provider_client = self.app.test_client()
+        self.login(provider_client, "provider@test.example")
+        provider_response = provider_client.get(
+            f"/bookings/new/{data['service_id']}"
+        )
+        self.assertEqual(provider_response.status_code, 403)
+
 
 if __name__ == "__main__":
     unittest.main()
